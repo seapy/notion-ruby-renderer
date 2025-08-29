@@ -43,16 +43,19 @@ module NotionRubyRenderer
         nil
       end
 
-      # Handle nested children blocks
-      if block["has_children"] && block["children"]
-        children_html = @renderer.render(block["children"], context)
-        
+      # Handle nested children blocks (except for toggle and table which handle their own children)
+      if block["has_children"] && block["children"] && type != "toggle" && type != "table"
         if type == "bulleted_list_item" || type == "numbered_list_item"
+          # For list items, render children without the wrapping newlines
+          children_html = render_nested_list(block["children"], context)
           html_content = html_content.gsub("</li>", "#{children_html}</li>")
-        elsif html_content
-          html_content = "#{html_content}\n#{children_html}"
         else
-          html_content = children_html
+          children_html = @renderer.render(block["children"], context)
+          if html_content
+            html_content = "#{html_content}\n#{children_html}"
+          else
+            html_content = children_html
+          end
         end
       end
 
@@ -61,18 +64,46 @@ module NotionRubyRenderer
 
     private
 
+    def render_nested_list(children, context)
+      # Handle both API response format and direct array format
+      children_array = children.is_a?(Hash) && children["results"] ? children["results"] : children
+      
+      # Group list items by type for nested lists
+      if children_array.all? { |c| c["type"] == "bulleted_list_item" }
+        items = children_array.map { |c| render(c, context) }
+        "<ul>#{items.join}</ul>"
+      elsif children_array.all? { |c| c["type"] == "numbered_list_item" }
+        items = children_array.map { |c| render(c, context) }
+        "<ol>#{items.join}</ol>"
+      else
+        @renderer.render(children, context)
+      end
+    end
+
     def render_paragraph(block)
       content = @rich_text_renderer.render(block["paragraph"]["rich_text"])
-      css_class = @renderer.css_classes[:paragraph]
-      class_attr = css_class ? " class=\"#{css_class}\"" : ""
+      color = block["paragraph"]["color"]
+      
+      css_classes = []
+      css_classes << @renderer.css_classes[:paragraph] if @renderer.css_classes[:paragraph]
+      css_classes << "notion-color-#{color.gsub('_', '-')}" if color && color != "default"
+      
+      class_attr = css_classes.any? ? " class=\"#{css_classes.join(' ')}\"" : ""
       "<p#{class_attr}>#{content}</p>"
     end
 
     def render_heading(block, level)
-      content = @rich_text_renderer.render(block["heading_#{level}"]["rich_text"])
+      heading_data = block["heading_#{level}"]
+      content = @rich_text_renderer.render(heading_data["rich_text"])
       css_class = @renderer.css_classes["h#{level}".to_sym]
       class_attr = css_class ? " class=\"#{css_class}\"" : ""
-      "<h#{level}#{class_attr}>#{content}</h#{level}>"
+      heading_html = "<h#{level}#{class_attr}>#{content}</h#{level}>"
+      
+      if heading_data["is_toggleable"]
+        "<details><summary>#{heading_html}</summary></details>"
+      else
+        heading_html
+      end
     end
 
     def render_list_item(block)
@@ -92,7 +123,16 @@ module NotionRubyRenderer
     end
 
     def render_code(block)
-      content = block["code"]["rich_text"].map { |rt| rt["plain_text"] }.join
+      # Extract text content - support both formats
+      content = block["code"]["rich_text"].map do |rt|
+        if rt["plain_text"]
+          rt["plain_text"]
+        elsif rt["text"]
+          rt["text"]["content"]
+        else
+          ""
+        end
+      end.join
       language = block["code"]["language"]
       
       code_class = language ? "language-#{language}" : ""
@@ -101,10 +141,11 @@ module NotionRubyRenderer
       
       class_attr = code_class.empty? ? "" : " class=\"#{code_class}\""
       
-      pre_class = @renderer.css_classes[:pre]
-      pre_attr = pre_class ? " class=\"#{pre_class}\"" : ""
+      # Use notion-code as default pre class
+      pre_class = @renderer.css_classes[:pre] || "notion-code"
+      pre_attr = " class=\"#{pre_class}\""
       
-      "<pre#{pre_attr}><code#{class_attr}>#{escape_html(content)}</code></pre>"
+      "<pre#{pre_attr}><code#{class_attr}>#{content}</code></pre>"
     end
 
     def render_divider
@@ -140,20 +181,7 @@ module NotionRubyRenderer
       url = block["bookmark"]["url"]
       caption = @rich_text_renderer.render(block["bookmark"]["caption"])
       
-      title = fetch_page_title(url) || caption || "Link"
-      
-      css_class = @renderer.css_classes[:bookmark]
-      class_attr = css_class ? " class=\"#{css_class}\"" : ""
-      
-      <<~HTML
-        <div#{class_attr}>
-          <a href="#{escape_html(url)}" target="_blank" rel="noopener noreferrer">
-            <div class="bookmark-title">#{escape_html(title)}</div>
-            <div class="bookmark-url">#{escape_html(url)}</div>
-          </a>
-        </div>
-      HTML
-      .strip
+      "<div class=\"notion-bookmark\"><a href=\"#{escape_html(url)}\">#{escape_html(url)}</a><p>#{caption}</p></div>"
     end
 
     def render_toggle(block, context)
@@ -175,63 +203,61 @@ module NotionRubyRenderer
     def render_callout(block)
       content = @rich_text_renderer.render(block["callout"]["rich_text"])
       icon = block["callout"]["icon"]
+      color = block["callout"]["color"]
       
-      css_class = @renderer.css_classes[:callout]
-      class_attr = css_class ? " class=\"#{css_class}\"" : ""
+      css_classes = ["notion-callout"]
+      css_classes << "notion-color-#{color.gsub('_', '-')}" if color && color != "default"
       
-      icon_html = if icon
-        if icon["type"] == "emoji"
-          "<span class=\"callout-icon\">#{icon["emoji"]}</span>"
-        else
-          ""
-        end
+      class_attr = " class=\"#{css_classes.join(' ')}\""
+      
+      icon_html = if icon && icon["type"] == "emoji"
+        "<span class=\"notion-callout-icon\">#{icon["emoji"]}</span>"
       else
         ""
       end
       
-      <<~HTML
-        <div#{class_attr}>
-          #{icon_html}
-          <div class="callout-content">#{content}</div>
-        </div>
-      HTML
-      .strip
+      "<div#{class_attr}>#{icon_html}<div class=\"notion-callout-content\">#{content}</div></div>"
     end
 
     def render_table(block)
       css_class = @renderer.css_classes[:table]
       class_attr = css_class ? " class=\"#{css_class}\"" : ""
       
-      html = "<table#{class_attr}>"
+      html = "<table#{class_attr}>\n"
       
       if block["has_children"] && block["children"]
-        block["children"]["results"].each_with_index do |row, index|
-          row_html = render_table_row(row)
-          if index == 0 && block["table"]["has_row_header"]
-            html += "<thead>#{row_html}</thead><tbody>"
+        # Handle both API response format and direct array format
+        children = block["children"].is_a?(Hash) && block["children"]["results"] ? block["children"]["results"] : block["children"]
+        
+        children.each_with_index do |row, index|
+          is_header = index == 0 && block["table"]["has_column_header"]
+          row_html = render_table_row(row, is_header)
+          if is_header
+            html += "<thead>\n#{row_html}</thead>\n<tbody>\n"
           elsif index == 0
-            html += "<tbody>#{row_html}"
+            html += "<tbody>\n#{row_html}"
           else
             html += row_html
           end
         end
-        html += "</tbody>" if block["children"]["results"].any?
+        html += "</tbody>\n" if children.any?
       end
       
       html += "</table>"
       html
     end
 
-    def render_table_row(block)
+    def render_table_row(block, is_header = false)
       cells = block["table_row"]["cells"]
       html = "<tr>"
+      tag = is_header ? "th" : "td"
       
       cells.each do |cell|
         content = @rich_text_renderer.render(cell)
-        html += "<td>#{content}</td>"
+        html += "<#{tag}>#{content}</#{tag}>"
       end
       
-      html += "</tr>"
+      html += "</tr>\n"
       html
     end
 

@@ -87,7 +87,35 @@ link_tag = NotionRubyRenderer::CssProvider.css_tag(href: '/assets/notion.css')
 
 ## 개발
 
-저장소를 체크아웃한 후, `bin/setup`을 실행하여 의존성을 설치하세요. 그런 다음 `rake test`를 실행하여 테스트를 실행하세요.
+저장소를 체크아웃한 후, `bin/setup`을 실행하여 의존성을 설치하세요.
+
+### 테스트 실행
+
+```bash
+# 모든 테스트 실행
+bundle exec rspec
+
+# 특정 테스트 파일 실행
+bundle exec rspec spec/notion_ruby_renderer/renderer_spec.rb
+```
+
+### 시각적 프리뷰 생성
+
+렌더링 결과를 시각적으로 확인할 수 있는 HTML 프리뷰를 생성할 수 있습니다:
+
+```bash
+# 프리뷰 HTML 생성
+ruby spec/generate_preview.rb
+
+# 생성된 파일은 spec/preview.html에 저장됩니다
+# 브라우저에서 파일을 열어 렌더링 결과를 확인하세요
+```
+
+프리뷰 페이지는 다음 내용을 포함합니다:
+- 지원되는 모든 Notion 블록 타입의 렌더링 예시
+- 입력 블록 데이터 (JSON)
+- 렌더링된 HTML 출력
+- HTML 소스 코드
 
 ## 라이선스
 

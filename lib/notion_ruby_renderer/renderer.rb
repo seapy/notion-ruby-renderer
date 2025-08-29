@@ -14,7 +14,11 @@ module NotionRubyRenderer
       list_items = []
       current_list_type = nil
 
-      blocks["results"].each do |block|
+      # Handle both array of blocks and Notion API response format
+      blocks_array = blocks.is_a?(Hash) && blocks["results"] ? blocks["results"] : blocks
+      blocks_array = [blocks_array] unless blocks_array.is_a?(Array)
+
+      blocks_array.each do |block|
         type = block["type"]
 
         if type == "bulleted_list_item" || type == "numbered_list_item"
@@ -45,12 +49,16 @@ module NotionRubyRenderer
       html_parts.compact.join("\n")
     end
 
+    def render_block(block, context = nil)
+      block_renderer.render(block, context)
+    end
+
     private
 
     def wrap_list_items(items, list_type)
       css_class = css_classes[list_type.to_sym]
       class_attr = css_class ? " class=\"#{css_class}\"" : ""
-      "<#{list_type}#{class_attr}>#{items.join}</#{list_type}>"
+      "<#{list_type}#{class_attr}>\n#{items.join("\n")}\n</#{list_type}>"
     end
   end
 end

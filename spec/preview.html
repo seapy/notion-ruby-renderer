@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notion Ruby Renderer - Visual Test Preview</title>
+  <style>
+    /* Base styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    h1 {
+      color: #2c3e50;
+      border-bottom: 3px solid #3498db;
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .test-section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .test-title {
+      color: #2c3e50;
+      margin-top: 0;
+      font-size: 1.3em;
+      border-bottom: 2px solid #ecf0f1;
+      padding-bottom: 10px;
+    }
+    
+    .test-input, .test-output, .test-html-source {
+      margin: 15px 0;
+    }
+    
+    .test-input h4, .test-output h4, .test-html-source h4 {
+      color: #7f8c8d;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .test-input pre, .test-html-source pre {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 15px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    
+    .test-input code, .test-html-source code {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    }
+    
+    .rendered-content {
+      background: #fff;
+      border: 2px solid #e1e8ed;
+      border-radius: 4px;
+      padding: 20px;
+      min-height: 50px;
+    }
+    
+    /* Notion styles from the gem */
+    /* Notion Renderer Default Styles */
+
+/* Typography */
+.notion-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  color: #37352f;
+}
+
+.notion-content h1,
+.notion-content h2,
+.notion-content h3 {
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.notion-content h1 {
+  font-size: 2em;
+}
+
+.notion-content h2 {
+  font-size: 1.5em;
+}
+
+.notion-content h3 {
+  font-size: 1.25em;
+}
+
+.notion-content p {
+  margin: 1em 0;
+}
+
+/* Lists */
+.notion-content ul,
+.notion-content ol {
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+
+.notion-content li {
+  margin: 0.5em 0;
+}
+
+/* Code blocks */
+.notion-content pre {
+  background-color: #f7f6f3;
+  border-radius: 3px;
+  padding: 1em;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.notion-content code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.875em;
+}
+
+/* Inline code */
+.notion-content p code,
+.notion-content li code {
+  background-color: rgba(135, 131, 120, 0.15);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.875em;
+}
+
+/* Blockquotes */
+.notion-content blockquote {
+  border-left: 3px solid #37352f;
+  padding-left: 1em;
+  margin: 1em 0;
+  font-style: italic;
+  color: #787774;
+}
+
+/* Dividers */
+.notion-content hr {
+  border: none;
+  border-top: 1px solid #e5e5e5;
+  margin: 2em 0;
+}
+
+/* Images */
+.notion-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+}
+
+.notion-content figure {
+  margin: 1.5em 0;
+  text-align: center;
+}
+
+.notion-content figcaption {
+  margin-top: 0.5em;
+  font-size: 0.875em;
+  color: #787774;
+}
+
+/* Bookmarks */
+.notion-content .bookmark {
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  padding: 12px;
+  margin: 1em 0;
+  transition: background-color 0.2s;
+}
+
+.notion-content .bookmark:hover {
+  background-color: #f7f6f3;
+}
+
+.notion-content .bookmark a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.notion-content .bookmark-title {
+  font-weight: 500;
+  margin-bottom: 0.25em;
+  color: #37352f;
+}
+
+.notion-content .bookmark-url {
+  font-size: 0.875em;
+  color: #787774;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Callouts */
+.notion-content .callout {
+  display: flex;
+  padding: 1em;
+  margin: 1em 0;
+  background-color: #f7f6f3;
+  border-radius: 3px;
+  gap: 0.75em;
+}
+
+.notion-content .callout-icon {
+  font-size: 1.25em;
+  flex-shrink: 0;
+}
+
+.notion-content .callout-content {
+  flex: 1;
+}
+
+/* Toggle/Details */
+.notion-content details {
+  margin: 1em 0;
+}
+
+.notion-content details summary {
+  cursor: pointer;
+  padding: 0.5em;
+  background-color: #f7f6f3;
+  border-radius: 3px;
+  user-select: none;
+}
+
+.notion-content details summary:hover {
+  background-color: #efedea;
+}
+
+.notion-content details[open] summary {
+  margin-bottom: 0.5em;
+}
+
+/* Tables */
+.notion-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.notion-content th,
+.notion-content td {
+  border: 1px solid #e5e5e5;
+  padding: 0.5em 1em;
+  text-align: left;
+}
+
+.notion-content th {
+  background-color: #f7f6f3;
+  font-weight: 600;
+}
+
+.notion-content tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Links */
+.notion-content a {
+  color: #337EA9;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.notion-content a:hover {
+  text-decoration: none;
+}
+
+/* Text formatting */
+.notion-content strong {
+  font-weight: 600;
+}
+
+.notion-content em {
+  font-style: italic;
+}
+
+.notion-content s {
+  text-decoration: line-through;
+}
+
+.notion-content u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+    
+    /* Additional styles for better visibility */
+    .notion-callout {
+      margin: 10px 0;
+    }
+    
+    .notion-bookmark {
+      border: 1px solid #e1e8ed;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    
+    table {
+      margin: 10px 0;
+    }
+    
+    blockquote {
+      margin: 10px 0;
+    }
+    
+    details {
+      margin: 10px 0;
+    }
+    
+    .timestamp {
+      color: #7f8c8d;
+      font-size: 0.9em;
+      margin-top: 30px;
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid #ecf0f1;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎨 Notion Ruby Renderer - Visual Test Preview</h1>
+  <p>This page shows the rendering output for various Notion block types. Each section displays the input block data, the rendered HTML output, and the HTML source code.</p>
+  
+  <div class="test-section">
+  <h3 class="test-title">Paragraph - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "paragraph", "paragraph" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "This is a simple paragraph."}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <p>This is a simple paragraph.</p>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;p&gt;This is a simple paragraph.&lt;/p&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Paragraph - formatted</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "paragraph", "paragraph" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "This is "}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; "bold"}, "annotations" =&gt; {"bold" =&gt; true}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; ", "}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; "italic"}, "annotations" =&gt; {"italic" =&gt; true}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; ", "}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; "underline"}, "annotations" =&gt; {"underline" =&gt; true}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; ", and "}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; "strikethrough"}, "annotations" =&gt; {"strikethrough" =&gt; true}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; " text."}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <p>This is <strong>bold</strong>, <em>italic</em>, <u>underline</u>, and <s>strikethrough</s> text.</p>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;p&gt;This is &lt;strong&gt;bold&lt;/strong&gt;, &lt;em&gt;italic&lt;/em&gt;, &lt;u&gt;underline&lt;/u&gt;, and &lt;s&gt;strikethrough&lt;/s&gt; text.&lt;/p&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Paragraph - with_link</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "paragraph", "paragraph" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Visit "}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; "OpenAI", "link" =&gt; {"url" =&gt; "https://openai.com"}}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; " for more info."}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <p>Visit <a href="https://openai.com">OpenAI</a> for more info.</p>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;p&gt;Visit &lt;a href="https://openai.com"&gt;OpenAI&lt;/a&gt; for more info.&lt;/p&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Paragraph - colored</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "paragraph", "paragraph" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Red text"}, "annotations" =&gt; {"color" =&gt; "red"}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; " and "}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; "blue background"}, "annotations" =&gt; {"color" =&gt; "blue_background"}}], "color" =&gt; "gray_background"}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <p class="notion-color-gray-background"><span class="notion-color-red">Red text</span> and <span class="notion-color-blue-background">blue background</span></p>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;p class="notion-color-gray-background"&gt;&lt;span class="notion-color-red"&gt;Red text&lt;/span&gt; and &lt;span class="notion-color-blue-background"&gt;blue background&lt;/span&gt;&lt;/p&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Heading 1 - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "heading_1", "heading_1" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Heading Level 1"}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <h1>Heading Level 1</h1>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;h1&gt;Heading Level 1&lt;/h1&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Heading 1 - with_toggle</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "heading_1", "heading_1" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Toggleable Heading 1"}}], "is_toggleable" =&gt; true}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <details><summary><h1>Toggleable Heading 1</h1></summary></details>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;details&gt;&lt;summary&gt;&lt;h1&gt;Toggleable Heading 1&lt;/h1&gt;&lt;/summary&gt;&lt;/details&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Heading 2 - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "heading_2", "heading_2" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Heading Level 2"}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <h2>Heading Level 2</h2>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;h2&gt;Heading Level 2&lt;/h2&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Heading 3 - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "heading_3", "heading_3" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Heading Level 3"}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <h3>Heading Level 3</h3>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;h3&gt;Heading Level 3&lt;/h3&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Bulleted list item - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "bulleted_list_item", "bulleted_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "First bullet point"}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <li>First bullet point</li>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;li&gt;First bullet point&lt;/li&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Bulleted list item - nested</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "bulleted_list_item", "bulleted_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Parent bullet"}}]}, "has_children" =&gt; true, "children" =&gt; [{"type" =&gt; "bulleted_list_item", "bulleted_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Nested bullet 1"}}]}}, {"type" =&gt; "bulleted_list_item", "bulleted_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Nested bullet 2"}}]}}]}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <li>Parent bullet<ul><li>Nested bullet 1</li><li>Nested bullet 2</li></ul></li>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;li&gt;Parent bullet&lt;ul&gt;&lt;li&gt;Nested bullet 1&lt;/li&gt;&lt;li&gt;Nested bullet 2&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Numbered list item - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "numbered_list_item", "numbered_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "First numbered item"}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <li>First numbered item</li>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;li&gt;First numbered item&lt;/li&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Numbered list item - nested</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "numbered_list_item", "numbered_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Parent numbered item"}}]}, "has_children" =&gt; true, "children" =&gt; [{"type" =&gt; "numbered_list_item", "numbered_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Nested numbered 1"}}]}}]}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <li>Parent numbered item<ol><li>Nested numbered 1</li></ol></li>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;li&gt;Parent numbered item&lt;ol&gt;&lt;li&gt;Nested numbered 1&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Quote - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "quote", "quote" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "This is a quote block."}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <blockquote>This is a quote block.</blockquote>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;blockquote&gt;This is a quote block.&lt;/blockquote&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Code - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "code", "code" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "def hello_world\n  puts 'Hello, World!'\nend"}}], "language" =&gt; "ruby"}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <pre class="notion-code"><code class="language-ruby">def hello_world
+  puts 'Hello, World!'
+end</code></pre>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;pre class="notion-code"&gt;&lt;code class="language-ruby"&gt;def hello_world
+  puts 'Hello, World!'
+end&lt;/code&gt;&lt;/pre&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Code - no_language</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "code", "code" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "plain code block without language"}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <pre class="notion-code"><code>plain code block without language</code></pre>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;pre class="notion-code"&gt;&lt;code&gt;plain code block without language&lt;/code&gt;&lt;/pre&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Divider - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "divider", "divider" =&gt; {}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <hr>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;hr&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Toggle - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "toggle", "toggle" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Toggle header"}}]}, "has_children" =&gt; true, "children" =&gt; [{"type" =&gt; "paragraph", "paragraph" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Hidden content inside toggle"}}]}}]}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <details><summary>Toggle header</summary><p>Hidden content inside toggle</p></details>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;details&gt;&lt;summary&gt;Toggle header&lt;/summary&gt;&lt;p&gt;Hidden content inside toggle&lt;/p&gt;&lt;/details&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Callout - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "callout", "callout" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "This is a callout!"}}], "icon" =&gt; {"type" =&gt; "emoji", "emoji" =&gt; "💡"}}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <div class="notion-callout"><span class="notion-callout-icon">💡</span><div class="notion-callout-content">This is a callout!</div></div>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;div class="notion-callout"&gt;&lt;span class="notion-callout-icon"&gt;💡&lt;/span&gt;&lt;div class="notion-callout-content"&gt;This is a callout!&lt;/div&gt;&lt;/div&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Callout - with_color</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "callout", "callout" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Important notice"}}], "icon" =&gt; {"type" =&gt; "emoji", "emoji" =&gt; "⚠️"}, "color" =&gt; "red_background"}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <div class="notion-callout notion-color-red-background"><span class="notion-callout-icon">⚠️</span><div class="notion-callout-content">Important notice</div></div>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;div class="notion-callout notion-color-red-background"&gt;&lt;span class="notion-callout-icon"&gt;⚠️&lt;/span&gt;&lt;div class="notion-callout-content"&gt;Important notice&lt;/div&gt;&lt;/div&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Image - external</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "image", "image" =&gt; {"type" =&gt; "external", "external" =&gt; {"url" =&gt; "https://example.com/image.jpg"}, "caption" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Sample image caption"}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <figure><img src="https://example.com/image.jpg" alt="Sample image caption"><figcaption>Sample image caption</figcaption></figure>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;figure&gt;&lt;img src="https://example.com/image.jpg" alt="Sample image caption"&gt;&lt;figcaption&gt;Sample image caption&lt;/figcaption&gt;&lt;/figure&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Image - file</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "image", "image" =&gt; {"type" =&gt; "file", "file" =&gt; {"url" =&gt; "https://notion.so/image.jpg"}}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <img src="https://notion.so/image.jpg" alt="">
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;img src="https://notion.so/image.jpg" alt=""&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Bookmark - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "bookmark", "bookmark" =&gt; {"url" =&gt; "https://www.example.com", "caption" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Example bookmark"}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <div class="notion-bookmark"><a href="https://www.example.com">https://www.example.com</a><p>Example bookmark</p></div>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;div class="notion-bookmark"&gt;&lt;a href="https://www.example.com"&gt;https://www.example.com&lt;/a&gt;&lt;p&gt;Example bookmark&lt;/p&gt;&lt;/div&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Table - simple</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "table", "table" =&gt; {"has_column_header" =&gt; true, "has_row_header" =&gt; false, "table_width" =&gt; 3}, "has_children" =&gt; true, "children" =&gt; [{"type" =&gt; "table_row", "table_row" =&gt; {"cells" =&gt; [[{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Header 1"}}], [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Header 2"}}], [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Header 3"}}]]}}, {"type" =&gt; "table_row", "table_row" =&gt; {"cells" =&gt; [[{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Cell 1,1"}}], [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Cell 1,2"}}], [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Cell 1,3"}}]]}}, {"type" =&gt; "table_row", "table_row" =&gt; {"cells" =&gt; [[{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Cell 2,1"}}], [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Cell 2,2"}}], [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Cell 2,3"}}]]}}]}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content">
+      <table>
+<thead>
+<tr><th>Header 1</th><th>Header 2</th><th>Header 3</th></tr>
+</thead>
+<tbody>
+<tr><td>Cell 1,1</td><td>Cell 1,2</td><td>Cell 1,3</td></tr>
+<tr><td>Cell 2,1</td><td>Cell 2,2</td><td>Cell 2,3</td></tr>
+</tbody>
+</table>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;&lt;th&gt;Header 1&lt;/th&gt;&lt;th&gt;Header 2&lt;/th&gt;&lt;th&gt;Header 3&lt;/th&gt;&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Cell 1,1&lt;/td&gt;&lt;td&gt;Cell 1,2&lt;/td&gt;&lt;td&gt;Cell 1,3&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Cell 2,1&lt;/td&gt;&lt;td&gt;Cell 2,2&lt;/td&gt;&lt;td&gt;Cell 2,3&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Combined Lists (List Wrapping Test)</h3>
+  <div class="test-input">
+    <h4>Input (Multiple List Items):</h4>
+    <pre><code>[{"type" =&gt; "bulleted_list_item", "bulleted_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Bullet 1"}}]}}, {"type" =&gt; "bulleted_list_item", "bulleted_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Bullet 2"}}]}}, {"type" =&gt; "numbered_list_item", "numbered_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Number 1"}}]}}, {"type" =&gt; "numbered_list_item", "numbered_list_item" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Number 2"}}]}}]</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Wrapped Lists):</h4>
+    <div class="rendered-content">
+      <ul>
+<li>Bullet 1</li>
+<li>Bullet 2</li>
+</ul>
+<ol>
+<li>Number 1</li>
+<li>Number 2</li>
+</ol>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;ul&gt;
+&lt;li&gt;Bullet 1&lt;/li&gt;
+&lt;li&gt;Bullet 2&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;Number 1&lt;/li&gt;
+&lt;li&gt;Number 2&lt;/li&gt;
+&lt;/ol&gt;</code></pre>
+  </div>
+</div>
+
+  
+  <div class="timestamp">
+    Generated on: 2025-08-29 16:32:58
+  </div>
+</body>
+</html>

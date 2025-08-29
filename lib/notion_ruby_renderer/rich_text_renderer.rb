@@ -8,21 +8,28 @@ module NotionRubyRenderer
       return "" unless rich_text_array
 
       rich_text_array.map do |rich_text|
-        text = escape_html(rich_text["plain_text"])
+        # Extract text content - support both formats
+        text_content = if rich_text["plain_text"]
+          rich_text["plain_text"]
+        elsif rich_text["text"]
+          rich_text["text"]["content"]
+        else
+          ""
+        end
+        
+        text = escape_html(text_content)
         annotations = rich_text["annotations"]
+        
+        # Check for link in text object (Notion API format)
+        href = rich_text["href"] || (rich_text["text"] && rich_text["text"]["link"] && rich_text["text"]["link"]["url"])
 
         if annotations
-          style_attrs = []
+          css_classes = []
           
           if annotations["color"] && annotations["color"] != "default"
-            color = annotations["color"]
-            
-            if color.end_with?("_background")
-              bg_color = color.sub("_background", "")
-              style_attrs << "background-color: #{@color_mapper.get_color(bg_color)}"
-            else
-              style_attrs << "color: #{@color_mapper.get_color(color)}"
-            end
+            # Replace underscores with hyphens for CSS class names
+            color_class = annotations["color"].gsub("_", "-")
+            css_classes << "notion-color-#{color_class}"
           end
           
           text = "<strong>#{text}</strong>" if annotations["bold"]
@@ -31,18 +38,14 @@ module NotionRubyRenderer
           text = "<u>#{text}</u>" if annotations["underline"]
           
           if annotations["code"]
-            code_styles = ["color: #EB5757"]
-            style_attrs.each do |attr|
-              code_styles << attr if attr.start_with?("background-color")
-            end
-            text = "<code style=\"#{code_styles.join('; ')}\">#{text}</code>"
-          elsif style_attrs.any?
-            text = "<span style=\"#{style_attrs.join('; ')}\">#{text}</span>"
+            text = "<code>#{text}</code>"
+          elsif css_classes.any?
+            text = "<span class=\"#{css_classes.join(' ')}\">#{text}</span>"
           end
         end
 
-        if rich_text["href"]
-          text = "<a href=\"#{rich_text["href"]}\">#{text}</a>"
+        if href
+          text = "<a href=\"#{href}\">#{text}</a>"
         end
 
         text
