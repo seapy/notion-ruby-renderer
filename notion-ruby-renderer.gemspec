@@ -5,8 +5,8 @@ require_relative "lib/notion_ruby_renderer/version"
 Gem::Specification.new do |spec|
   spec.name = "notion-ruby-renderer"
   spec.version = NotionRubyRenderer::VERSION
-  spec.authors = ["seapy"]
-  spec.email = ["seapy@example.com"]
+  spec.authors = ["Changhoon Jung"]
+  spec.email = ["iamseapy@gmail.com"]
 
   spec.summary = "A Ruby gem for rendering Notion blocks to HTML"
   spec.description = "Convert Notion API block objects to semantic HTML with customizable styling and image handling"
