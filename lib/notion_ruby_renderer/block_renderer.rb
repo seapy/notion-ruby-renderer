@@ -76,7 +76,7 @@ module NotionRubyRenderer
         items = children_array.map { |c| render(c, context) }
         "<ol>#{items.join}</ol>"
       else
-        @renderer.render(children, context)
+        @renderer.render(children, context, wrapper: false)
       end
     end
 
@@ -192,7 +192,7 @@ module NotionRubyRenderer
       html = "<details#{class_attr}><summary>#{summary}</summary>"
       
       if block["has_children"] && block["children"]
-        children_html = @renderer.render(block["children"], context)
+        children_html = @renderer.render(block["children"], context, wrapper: false)
         html += children_html
       end
       

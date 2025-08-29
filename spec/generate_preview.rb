@@ -26,7 +26,7 @@ def generate_preview_html
           </div>
           <div class="test-output">
             <h4>Output (Rendered HTML):</h4>
-            <div class="rendered-content">
+            <div class="rendered-content notion-ruby-renderer">
               #{rendered_html}
             </div>
           </div>
@@ -41,7 +41,7 @@ def generate_preview_html
   
   # Add combined list test
   combined_blocks = NotionTestFixtures.get_block(:combined_list, :blocks)
-  combined_html = renderer.render(combined_blocks)
+  combined_html = renderer.render(combined_blocks, nil, wrapper: false)
   html_sections << <<~HTML
     <div class="test-section">
       <h3 class="test-title">Combined Lists (List Wrapping Test)</h3>
@@ -51,7 +51,7 @@ def generate_preview_html
       </div>
       <div class="test-output">
         <h4>Output (Wrapped Lists):</h4>
-        <div class="rendered-content">
+        <div class="rendered-content notion-ruby-renderer">
           #{combined_html}
         </div>
       </div>

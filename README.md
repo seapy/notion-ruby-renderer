@@ -24,8 +24,12 @@ require 'notion_ruby_renderer'
 # 기본 설정으로 렌더러 생성
 renderer = NotionRubyRenderer::Renderer.new
 
-# Notion 블록을 HTML로 렌더링
+# Notion 블록을 HTML로 렌더링 (기본적으로 wrapper div 포함)
 html = renderer.render(notion_blocks_json)
+# => "<div class=\"notion-ruby-renderer\">...</div>"
+
+# wrapper 없이 렌더링하려면:
+html = renderer.render(notion_blocks_json, nil, wrapper: false)
 ```
 
 ### 커스텀 이미지 처리

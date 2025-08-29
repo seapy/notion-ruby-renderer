@@ -9,7 +9,7 @@ module NotionRubyRenderer
       @block_renderer = BlockRenderer.new(self)
     end
 
-    def render(blocks, context = nil)
+    def render(blocks, context = nil, wrapper: true)
       html_parts = []
       list_items = []
       current_list_type = nil
@@ -46,7 +46,10 @@ module NotionRubyRenderer
         html_parts << wrap_list_items(list_items, current_list_type)
       end
 
-      html_parts.compact.join("\n")
+      content = html_parts.compact.join("\n")
+      
+      # Wrap with notion-ruby-renderer class by default
+      wrapper ? "<div class=\"notion-ruby-renderer\">#{content}</div>" : content
     end
 
     def render_block(block, context = nil)

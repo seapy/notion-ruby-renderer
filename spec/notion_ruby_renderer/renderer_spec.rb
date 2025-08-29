@@ -85,7 +85,7 @@ RSpec.describe NotionRubyRenderer::Renderer do
 
     it "wraps consecutive list items" do
       blocks = NotionTestFixtures.get_block(:combined_list, :blocks)
-      result = renderer.render(blocks)
+      result = renderer.render(blocks, nil, wrapper: false)
       expected = <<~HTML.strip
         <ul>
         <li>Bullet 1</li>
@@ -97,6 +97,13 @@ RSpec.describe NotionRubyRenderer::Renderer do
         </ol>
       HTML
       expect(result).to eq(expected)
+    end
+    
+    it "includes wrapper div by default" do
+      blocks = NotionTestFixtures.get_block(:combined_list, :blocks)
+      result = renderer.render(blocks)
+      expect(result).to include('<div class="notion-ruby-renderer">')
+      expect(result).to include('</div>')
     end
   end
 
