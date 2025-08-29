@@ -1,4 +1,6 @@
 require 'uri'
+require 'net/http'
+require 'open-uri'
 
 module NotionRubyRenderer
   class BlockRenderer
@@ -183,13 +185,8 @@ module NotionRubyRenderer
       url = block["bookmark"]["url"]
       caption = @rich_text_renderer.render(block["bookmark"]["caption"])
       
-      # Extract domain from URL for display
-      begin
-        uri = URI.parse(url)
-        domain = uri.host || url
-      rescue URI::InvalidURIError
-        domain = url
-      end
+      # Fetch the actual page title
+      title = fetch_page_title(url)
       
       # Since Notion API doesn't provide metadata, we'll display what we have
       # in a format that mimics Notion's bookmark appearance
@@ -198,8 +195,8 @@ module NotionRubyRenderer
       html += "<div class=\"notion-bookmark-content\">"
       html += "<div class=\"notion-bookmark-text\">"
       
-      # Show domain as title since we don't have the actual page title
-      html += "<div class=\"notion-bookmark-title\">#{escape_html(domain)}</div>"
+      # Show actual page title or fallback to domain
+      html += "<div class=\"notion-bookmark-title\">#{escape_html(title)}</div>"
       
       if caption && !caption.empty?
         html += "<div class=\"notion-bookmark-description\">#{caption}</div>"
@@ -214,6 +211,45 @@ module NotionRubyRenderer
       html += "</div>"
       
       html
+    end
+    
+    def fetch_page_title(url)
+      begin
+        uri = URI.parse(url)
+        
+        # Set timeout for the request
+        response = URI.open(url, 
+          "User-Agent" => "Mozilla/5.0 (compatible; NotionRubyRenderer/1.0)",
+          read_timeout: 5,
+          open_timeout: 5
+        ) do |f|
+          # Read only first 50KB to find title
+          content = f.read(50000)
+          
+          # Try to find title tag
+          if match = content.match(/<title[^>]*>([^<]+)<\/title>/i)
+            title = match[1].strip
+            # Decode HTML entities
+            title = title.gsub(/&quot;/, '"')
+                        .gsub(/&apos;/, "'")
+                        .gsub(/&lt;/, '<')
+                        .gsub(/&gt;/, '>')
+                        .gsub(/&amp;/, '&')
+            return title unless title.empty?
+          end
+        end
+        
+        # Fallback to domain if no title found
+        uri.host || url
+      rescue => e
+        # If fetching fails, fallback to domain or URL
+        begin
+          uri = URI.parse(url)
+          uri.host || url
+        rescue
+          url
+        end
+      end
     end
 
     def render_toggle(block, context)

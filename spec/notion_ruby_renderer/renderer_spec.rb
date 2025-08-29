@@ -187,10 +187,18 @@ RSpec.describe NotionRubyRenderer::Renderer do
   describe "bookmark rendering" do
     it "renders bookmark" do
       block = NotionTestFixtures.get_block(:bookmark, :simple)
+      
+      # Mock the fetch_page_title method to avoid real HTTP requests in tests
+      renderer.instance_eval do
+        def fetch_page_title(url)
+          "Example Domain"
+        end
+      end
+      
       result = renderer.render_block(block)
       expected = '<div class="notion-bookmark"><a href="https://www.example.com" target="_blank" rel="noopener noreferrer">' +
                  '<div class="notion-bookmark-content"><div class="notion-bookmark-text">' +
-                 '<div class="notion-bookmark-title">www.example.com</div>' +
+                 '<div class="notion-bookmark-title">Example Domain</div>' +
                  '<div class="notion-bookmark-description">Example bookmark</div>' +
                  '<div class="notion-bookmark-link">https://www.example.com</div>' +
                  '</div></div></a></div>'
