@@ -64,6 +64,42 @@ renderer = NotionRubyRenderer::Renderer.new(
 
 ### 기본 스타일 포함하기
 
+#### Rails 프로젝트에서 사용
+
+1. **Asset Pipeline을 통한 사용 (권장)**
+
+Gemfile에 gem을 추가한 후, application.css에서 require:
+
+```css
+/* app/assets/stylesheets/application.css */
+/*
+ *= require notion_renderer
+ */
+```
+
+또는 Sass/SCSS 파일에서:
+
+```scss
+// app/assets/stylesheets/application.scss
+@import "notion_renderer";
+```
+
+2. **View에서 직접 포함**
+
+```erb
+<!-- app/views/layouts/application.html.erb -->
+<%= stylesheet_link_tag 'notion_renderer' %>
+```
+
+3. **인라인 스타일로 포함**
+
+```erb
+<!-- View 파일 내에서 -->
+<%= NotionRubyRenderer::CssProvider.css_tag(inline: true).html_safe %>
+```
+
+#### 일반 Ruby 프로젝트에서 사용
+
 ```ruby
 # 기본 CSS를 문자열로 가져오기
 css = NotionRubyRenderer::CssProvider.default_css
@@ -72,7 +108,7 @@ css = NotionRubyRenderer::CssProvider.default_css
 style_tag = NotionRubyRenderer::CssProvider.css_tag(inline: true)
 
 # 링크 태그 생성
-link_tag = NotionRubyRenderer::CssProvider.css_tag(href: '/assets/notion.css')
+link_tag = NotionRubyRenderer::CssProvider.css_tag(href: '/assets/notion_renderer.css')
 ```
 
 ## 지원되는 Notion 블록 타입

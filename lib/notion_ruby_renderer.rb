@@ -6,6 +6,11 @@ require_relative "notion_ruby_renderer/image_handler"
 require_relative "notion_ruby_renderer/color_mapper"
 require_relative "notion_ruby_renderer/css_provider"
 
+# Load Rails Engine if Rails is defined
+if defined?(Rails)
+  require_relative "notion_ruby_renderer/engine"
+end
+
 module NotionRubyRenderer
   class Error < StandardError; end
 end
