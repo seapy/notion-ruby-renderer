@@ -188,7 +188,13 @@ RSpec.describe NotionRubyRenderer::Renderer do
     it "renders bookmark" do
       block = NotionTestFixtures.get_block(:bookmark, :simple)
       result = renderer.render_block(block)
-      expect(result).to eq('<div class="notion-bookmark"><a href="https://www.example.com">https://www.example.com</a><p>Example bookmark</p></div>')
+      expected = '<div class="notion-bookmark"><a href="https://www.example.com" target="_blank" rel="noopener noreferrer">' +
+                 '<div class="notion-bookmark-content"><div class="notion-bookmark-text">' +
+                 '<div class="notion-bookmark-title">www.example.com</div>' +
+                 '<div class="notion-bookmark-description">Example bookmark</div>' +
+                 '<div class="notion-bookmark-link">https://www.example.com</div>' +
+                 '</div></div></a></div>'
+      expect(result).to eq(expected)
     end
   end
 

@@ -1,3 +1,5 @@
+require 'uri'
+
 module NotionRubyRenderer
   class BlockRenderer
     def initialize(renderer)
@@ -181,7 +183,37 @@ module NotionRubyRenderer
       url = block["bookmark"]["url"]
       caption = @rich_text_renderer.render(block["bookmark"]["caption"])
       
-      "<div class=\"notion-bookmark\"><a href=\"#{escape_html(url)}\">#{escape_html(url)}</a><p>#{caption}</p></div>"
+      # Extract domain from URL for display
+      begin
+        uri = URI.parse(url)
+        domain = uri.host || url
+      rescue URI::InvalidURIError
+        domain = url
+      end
+      
+      # Since Notion API doesn't provide metadata, we'll display what we have
+      # in a format that mimics Notion's bookmark appearance
+      html = "<div class=\"notion-bookmark\">"
+      html += "<a href=\"#{escape_html(url)}\" target=\"_blank\" rel=\"noopener noreferrer\">"
+      html += "<div class=\"notion-bookmark-content\">"
+      html += "<div class=\"notion-bookmark-text\">"
+      
+      # Show domain as title since we don't have the actual page title
+      html += "<div class=\"notion-bookmark-title\">#{escape_html(domain)}</div>"
+      
+      if caption && !caption.empty?
+        html += "<div class=\"notion-bookmark-description\">#{caption}</div>"
+      end
+      
+      # Show full URL at the bottom (without icon)
+      html += "<div class=\"notion-bookmark-link\">#{escape_html(url)}</div>"
+      
+      html += "</div>"
+      html += "</div>"
+      html += "</a>"
+      html += "</div>"
+      
+      html
     end
 
     def render_toggle(block, context)
