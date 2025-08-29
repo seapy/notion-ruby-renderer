@@ -139,7 +139,8 @@
 
 /* Inline code */
 .notion-ruby-renderer p code,
-.notion-ruby-renderer li code {
+.notion-ruby-renderer li code,
+.notion-ruby-renderer blockquote code {
   background-color: rgba(135, 131, 120, 0.15);
   padding: 0.2em 0.4em;
   border-radius: 3px;
@@ -153,7 +154,6 @@
   border-left: 3px solid #37352f;
   padding-left: 1em;
   margin: 1em 0;
-  font-style: italic;
   color: #787774;
 }
 
@@ -602,6 +602,24 @@
 </div>
 
 <div class="test-section">
+  <h3 class="test-title">Quote - with_inline_code</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "quote", "quote" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "Use "}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; "console.log()"}, "annotations" =&gt; {"code" =&gt; true}}, {"type" =&gt; "text", "text" =&gt; {"content" =&gt; " to debug your JavaScript code."}}]}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content notion-ruby-renderer">
+      <blockquote>Use <code>console.log()</code> to debug your JavaScript code.</blockquote>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;blockquote&gt;Use &lt;code&gt;console.log()&lt;/code&gt; to debug your JavaScript code.&lt;/blockquote&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
   <h3 class="test-title">Code - simple</h3>
   <div class="test-input">
     <h4>Input (Notion Block):</h4>
@@ -835,7 +853,7 @@ end&lt;/code&gt;&lt;/pre&gt;</code></pre>
 
   
   <div class="timestamp">
-    Generated on: 2025-08-29 18:43:14
+    Generated on: 2025-08-29 19:42:06
   </div>
 </body>
 </html>

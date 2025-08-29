@@ -171,6 +171,16 @@ module NotionTestFixtures
             { "type" => "text", "text" => { "content" => "This is a quote block." } }
           ]
         }
+      },
+      with_inline_code: {
+        "type" => "quote",
+        "quote" => {
+          "rich_text" => [
+            { "type" => "text", "text" => { "content" => "Use " } },
+            { "type" => "text", "text" => { "content" => "console.log()" }, "annotations" => { "code" => true } },
+            { "type" => "text", "text" => { "content" => " to debug your JavaScript code." } }
+          ]
+        }
       }
     },
 

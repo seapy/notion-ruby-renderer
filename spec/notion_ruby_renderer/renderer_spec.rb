@@ -113,6 +113,12 @@ RSpec.describe NotionRubyRenderer::Renderer do
       result = renderer.render_block(block)
       expect(result).to eq('<blockquote>This is a quote block.</blockquote>')
     end
+
+    it "renders quote block with inline code" do
+      block = NotionTestFixtures.get_block(:quote, :with_inline_code)
+      result = renderer.render_block(block)
+      expect(result).to eq('<blockquote>Use <code>console.log()</code> to debug your JavaScript code.</blockquote>')
+    end
   end
 
   describe "code rendering" do
