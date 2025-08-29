@@ -201,6 +201,15 @@ module NotionTestFixtures
             { "type" => "text", "text" => { "content" => "plain code block without language" } }
           ]
         }
+      },
+      with_html_template: {
+        "type" => "code",
+        "code" => {
+          "rich_text" => [
+            { "type" => "text", "text" => { "content" => "<!-- public/proxy/503.html -->\n<main>\n  <h1>일시 점검 중입니다</h1>\n  <p>\n    {{ if .Message }}\n      {{ .Message }}\n    {{ else }}\n      점검 중입니다. 잠시 후 다시 이용해 주세요.\n    {{ end }}\n  </p>\n</main>" } }
+          ],
+          "language" => "html"
+        }
       }
     },
 

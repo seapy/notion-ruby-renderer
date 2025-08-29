@@ -673,14 +673,14 @@
     <h4>Output (Rendered HTML):</h4>
     <div class="rendered-content notion-ruby-renderer">
       <pre class="notion-code"><code class="language-ruby">def hello_world
-  puts 'Hello, World!'
+  puts &#39;Hello, World!&#39;
 end</code></pre>
     </div>
   </div>
   <div class="test-html-source">
     <h4>HTML Source:</h4>
     <pre><code>&lt;pre class="notion-code"&gt;&lt;code class="language-ruby"&gt;def hello_world
-  puts 'Hello, World!'
+  puts &#39;Hello, World!&#39;
 end&lt;/code&gt;&lt;/pre&gt;</code></pre>
   </div>
 </div>
@@ -700,6 +700,44 @@ end&lt;/code&gt;&lt;/pre&gt;</code></pre>
   <div class="test-html-source">
     <h4>HTML Source:</h4>
     <pre><code>&lt;pre class="notion-code"&gt;&lt;code&gt;plain code block without language&lt;/code&gt;&lt;/pre&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
+  <h3 class="test-title">Code - with_html_template</h3>
+  <div class="test-input">
+    <h4>Input (Notion Block):</h4>
+    <pre><code>{"type" =&gt; "code", "code" =&gt; {"rich_text" =&gt; [{"type" =&gt; "text", "text" =&gt; {"content" =&gt; "&lt;!-- public/proxy/503.html --&gt;\n&lt;main&gt;\n  &lt;h1&gt;일시 점검 중입니다&lt;/h1&gt;\n  &lt;p&gt;\n    {{ if .Message }}\n      {{ .Message }}\n    {{ else }}\n      점검 중입니다. 잠시 후 다시 이용해 주세요.\n    {{ end }}\n  &lt;/p&gt;\n&lt;/main&gt;"}}], "language" =&gt; "html"}}</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content notion-ruby-renderer">
+      <pre class="notion-code"><code class="language-html">&lt;!-- public/proxy/503.html --&gt;
+&lt;main&gt;
+  &lt;h1&gt;일시 점검 중입니다&lt;/h1&gt;
+  &lt;p&gt;
+    {{ if .Message }}
+      {{ .Message }}
+    {{ else }}
+      점검 중입니다. 잠시 후 다시 이용해 주세요.
+    {{ end }}
+  &lt;/p&gt;
+&lt;/main&gt;</code></pre>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;pre class="notion-code"&gt;&lt;code class="language-html"&gt;&lt;!-- public/proxy/503.html --&gt;
+&lt;main&gt;
+  &lt;h1&gt;일시 점검 중입니다&lt;/h1&gt;
+  &lt;p&gt;
+    {{ if .Message }}
+      {{ .Message }}
+    {{ else }}
+      점검 중입니다. 잠시 후 다시 이용해 주세요.
+    {{ end }}
+  &lt;/p&gt;
+&lt;/main&gt;&lt;/code&gt;&lt;/pre&gt;</code></pre>
   </div>
 </div>
 
@@ -897,7 +935,7 @@ end&lt;/code&gt;&lt;/pre&gt;</code></pre>
 
   
   <div class="timestamp">
-    Generated on: 2025-08-29 20:08:50
+    Generated on: 2025-08-30 03:34:34
   </div>
 </body>
 </html>

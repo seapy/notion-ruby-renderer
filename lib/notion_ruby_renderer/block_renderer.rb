@@ -139,6 +139,9 @@ module NotionRubyRenderer
       end.join
       language = block["code"]["language"]
       
+      # Escape HTML entities in code content
+      escaped_content = escape_html(content)
+      
       code_class = language ? "language-#{language}" : ""
       code_class += " #{@renderer.css_classes[:code]}" if @renderer.css_classes[:code]
       code_class = code_class.strip
@@ -149,7 +152,7 @@ module NotionRubyRenderer
       pre_class = @renderer.css_classes[:pre] || "notion-code"
       pre_attr = " class=\"#{pre_class}\""
       
-      "<pre#{pre_attr}><code#{class_attr}>#{content}</code></pre>"
+      "<pre#{pre_attr}><code#{class_attr}>#{escaped_content}</code></pre>"
     end
 
     def render_divider

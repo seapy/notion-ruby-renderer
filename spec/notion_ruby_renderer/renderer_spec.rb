@@ -127,7 +127,7 @@ RSpec.describe NotionRubyRenderer::Renderer do
       result = renderer.render_block(block)
       expected = <<~HTML.strip
         <pre class="notion-code"><code class="language-ruby">def hello_world
-          puts 'Hello, World!'
+          puts &#39;Hello, World!&#39;
         end</code></pre>
       HTML
       expect(result).to eq(expected)
@@ -137,6 +137,25 @@ RSpec.describe NotionRubyRenderer::Renderer do
       block = NotionTestFixtures.get_block(:code, :no_language)
       result = renderer.render_block(block)
       expect(result).to eq('<pre class="notion-code"><code>plain code block without language</code></pre>')
+    end
+
+    it "renders code block with HTML template syntax correctly escaped" do
+      block = NotionTestFixtures.get_block(:code, :with_html_template)
+      result = renderer.render_block(block)
+      expected = <<~HTML.strip
+        <pre class="notion-code"><code class="language-html">&lt;!-- public/proxy/503.html --&gt;
+        &lt;main&gt;
+          &lt;h1&gt;일시 점검 중입니다&lt;/h1&gt;
+          &lt;p&gt;
+            {{ if .Message }}
+              {{ .Message }}
+            {{ else }}
+              점검 중입니다. 잠시 후 다시 이용해 주세요.
+            {{ end }}
+          &lt;/p&gt;
+        &lt;/main&gt;</code></pre>
+      HTML
+      expect(result).to eq(expected)
     end
   end
 
