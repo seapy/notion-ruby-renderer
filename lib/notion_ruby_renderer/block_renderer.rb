@@ -43,6 +43,8 @@ module NotionRubyRenderer
         render_table(block)
       when "table_row"
         render_table_row(block)
+      when "table_of_contents"
+        render_table_of_contents(block)
       else
         nil
       end
@@ -108,6 +110,15 @@ module NotionRubyRenderer
       else
         heading_html
       end
+    end
+
+    def generate_heading_id(text)
+      # Convert heading text to a URL-safe ID
+      text.downcase
+          .gsub(/[^\w\s-]/, '') # Remove non-word characters
+          .gsub(/\s+/, '-')     # Replace spaces with hyphens
+          .gsub(/-+/, '-')      # Replace multiple hyphens with single
+          .gsub(/^-|-$/, '')    # Remove leading/trailing hyphens
     end
 
     def render_list_item(block)
@@ -322,14 +333,26 @@ module NotionRubyRenderer
       cells = block["table_row"]["cells"]
       html = "<tr>"
       tag = is_header ? "th" : "td"
-      
+
       cells.each do |cell|
         content = @rich_text_renderer.render(cell)
         html += "<#{tag}>#{content}</#{tag}>"
       end
-      
+
       html += "</tr>\n"
       html
+    end
+
+    def render_table_of_contents(block)
+      color = block["table_of_contents"]["color"] if block["table_of_contents"]
+
+      css_classes = ["notion-table-of-contents"]
+      css_classes << "notion-color-#{color.gsub('_', '-')}" if color && color != "default"
+
+      class_attr = " class=\"#{css_classes.join(' ')}\""
+
+      # This is a placeholder that will be replaced by the renderer with actual TOC
+      "<div#{class_attr} data-notion-toc=\"true\"></div>"
     end
 
     def fetch_page_title(url)
