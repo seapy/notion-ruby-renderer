@@ -709,6 +709,45 @@
 </div>
 
 <div class="test-section">
+  <h3 class="test-title">Table of contents - with_h3_only</h3>
+  <div class="test-input">
+    <h4>Input (Document structure):</h4>
+<pre><code>- Paragraph: "This document starts directly w..."
+- [Table of Contents Block]
+    - Heading 3: "First Detail Section"
+- Paragraph: "Some content under the first h3..."
+    - Heading 3: "Second Detail Section"
+- Paragraph: "More content under the second h..."
+    - Heading 3: "Third Detail Section"
+- Paragraph: "Additional content under the th..."</code></pre>
+  </div>
+  <div class="test-output">
+    <h4>Output (Rendered HTML):</h4>
+    <div class="rendered-content notion-ruby-renderer">
+      <p>This document starts directly with h3 headings.</p>
+<div class="notion-table-of-contents" data-notion-toc="true"><nav aria-label="Table of contents"><ul class="notion-table-of-contents-list"><li class="notion-table-of-contents-item notion-table-of-contents-item-level-3"><a href="#first-detail-section">First Detail Section</a></li><li class="notion-table-of-contents-item notion-table-of-contents-item-level-3"><a href="#second-detail-section">Second Detail Section</a></li><li class="notion-table-of-contents-item notion-table-of-contents-item-level-3"><a href="#third-detail-section">Third Detail Section</a></li></ul></nav></div>
+<h3 id="first-detail-section">First Detail Section</h3>
+<p>Some content under the first h3.</p>
+<h3 id="second-detail-section">Second Detail Section</h3>
+<p>More content under the second h3.</p>
+<h3 id="third-detail-section">Third Detail Section</h3>
+<p>Additional content under the third h3.</p>
+    </div>
+  </div>
+  <div class="test-html-source">
+    <h4>HTML Source:</h4>
+    <pre><code>&lt;p&gt;This document starts directly with h3 headings.&lt;/p&gt;
+&lt;div class="notion-table-of-contents" data-notion-toc="true"&gt;&lt;nav aria-label="Table of contents"&gt;&lt;ul class="notion-table-of-contents-list"&gt;&lt;li class="notion-table-of-contents-item notion-table-of-contents-item-level-3"&gt;&lt;a href="#first-detail-section"&gt;First Detail Section&lt;/a&gt;&lt;/li&gt;&lt;li class="notion-table-of-contents-item notion-table-of-contents-item-level-3"&gt;&lt;a href="#second-detail-section"&gt;Second Detail Section&lt;/a&gt;&lt;/li&gt;&lt;li class="notion-table-of-contents-item notion-table-of-contents-item-level-3"&gt;&lt;a href="#third-detail-section"&gt;Third Detail Section&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/nav&gt;&lt;/div&gt;
+&lt;h3 id="first-detail-section"&gt;First Detail Section&lt;/h3&gt;
+&lt;p&gt;Some content under the first h3.&lt;/p&gt;
+&lt;h3 id="second-detail-section"&gt;Second Detail Section&lt;/h3&gt;
+&lt;p&gt;More content under the second h3.&lt;/p&gt;
+&lt;h3 id="third-detail-section"&gt;Third Detail Section&lt;/h3&gt;
+&lt;p&gt;Additional content under the third h3.&lt;/p&gt;</code></pre>
+  </div>
+</div>
+
+<div class="test-section">
   <h3 class="test-title">Bulleted list item - simple</h3>
   <div class="test-input">
     <h4>Input (Notion Block):</h4>
@@ -1091,7 +1130,7 @@ end&lt;/code&gt;&lt;/pre&gt;</code></pre>
 
   
   <div class="timestamp">
-    Generated on: 2025-09-26 17:15:07
+    Generated on: 2025-09-26 18:02:23
   </div>
 </body>
 </html>

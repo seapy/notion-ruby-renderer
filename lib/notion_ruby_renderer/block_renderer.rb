@@ -45,12 +45,16 @@ module NotionRubyRenderer
         render_table_row(block)
       when "table_of_contents"
         render_table_of_contents(block)
+      when "column_list"
+        render_column_list(block, context)
+      when "column"
+        render_column(block, context)
       else
         nil
       end
 
-      # Handle nested children blocks (except for toggle and table which handle their own children)
-      if block["has_children"] && block["children"] && type != "toggle" && type != "table"
+      # Handle nested children blocks (except for toggle, table, column_list, and column which handle their own children)
+      if block["has_children"] && block["children"] && !["toggle", "table", "column_list", "column"].include?(type)
         if type == "bulleted_list_item" || type == "numbered_list_item"
           # For list items, render children without the wrapping newlines
           children_html = render_nested_list(block["children"], context)
@@ -361,6 +365,37 @@ module NotionRubyRenderer
 
       # This is a placeholder that will be replaced by the renderer with actual TOC
       "<div#{class_attr} data-notion-toc=\"true\"></div>"
+    end
+
+    def render_column_list(block, context)
+      html = "<div class=\"notion-columns\">"
+
+      if block["has_children"] && block["children"]
+        # Handle both API response format and direct array format
+        children = block["children"].is_a?(Hash) && block["children"]["results"] ? block["children"]["results"] : block["children"]
+
+        children.each do |column|
+          html += render(column, context)
+        end
+      end
+
+      html += "</div>"
+      html
+    end
+
+    def render_column(block, context)
+      width_ratio = block["column"]["width_ratio"] if block["column"]
+      style_attr = width_ratio ? " style=\"flex: #{width_ratio}\"" : ""
+
+      html = "<div class=\"notion-column\"#{style_attr}>"
+
+      if block["has_children"] && block["children"]
+        children_html = @renderer.render(block["children"], context, wrapper: false)
+        html += children_html
+      end
+
+      html += "</div>"
+      html
     end
 
     def fetch_page_title(url)

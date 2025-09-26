@@ -247,6 +247,70 @@ module NotionTestFixtures
             ]
           }
         }
+      ],
+      with_h3_only: [
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "This document starts directly with h3 headings." } }
+            ]
+          }
+        },
+        {
+          "type" => "table_of_contents",
+          "table_of_contents" => {
+            "color" => "default"
+          }
+        },
+        {
+          "type" => "heading_3",
+          "heading_3" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "First Detail Section" } }
+            ]
+          }
+        },
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Some content under the first h3." } }
+            ]
+          }
+        },
+        {
+          "type" => "heading_3",
+          "heading_3" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Second Detail Section" } }
+            ]
+          }
+        },
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "More content under the second h3." } }
+            ]
+          }
+        },
+        {
+          "type" => "heading_3",
+          "heading_3" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Third Detail Section" } }
+            ]
+          }
+        },
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Additional content under the third h3." } }
+            ]
+          }
+        }
       ]
     },
 
