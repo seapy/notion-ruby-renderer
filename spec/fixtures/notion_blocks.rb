@@ -95,6 +95,161 @@ module NotionTestFixtures
       }
     },
 
+    table_of_contents: {
+      with_document: [
+        {
+          "type" => "heading_1",
+          "heading_1" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Introduction" } }
+            ]
+          }
+        },
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "This document demonstrates the table of contents feature." } }
+            ]
+          }
+        },
+        {
+          "type" => "table_of_contents",
+          "table_of_contents" => {
+            "color" => "default"
+          }
+        },
+        {
+          "type" => "heading_2",
+          "heading_2" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Getting Started" } }
+            ]
+          }
+        },
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Let's begin with the basics." } }
+            ]
+          }
+        },
+        {
+          "type" => "heading_3",
+          "heading_3" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Prerequisites" } }
+            ]
+          }
+        },
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "You'll need Ruby installed." } }
+            ]
+          }
+        },
+        {
+          "type" => "heading_3",
+          "heading_3" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Installation" } }
+            ]
+          }
+        },
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Run bundle install to get started." } }
+            ]
+          }
+        },
+        {
+          "type" => "heading_2",
+          "heading_2" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Advanced Features" } }
+            ]
+          }
+        },
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Explore more advanced capabilities." } }
+            ]
+          }
+        },
+        {
+          "type" => "heading_1",
+          "heading_1" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "API Reference" } }
+            ]
+          }
+        },
+        {
+          "type" => "paragraph",
+          "paragraph" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Complete API documentation." } }
+            ]
+          }
+        },
+        {
+          "type" => "heading_2",
+          "heading_2" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Core Classes" } }
+            ]
+          }
+        },
+        {
+          "type" => "heading_2",
+          "heading_2" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Helper Methods" } }
+            ]
+          }
+        }
+      ],
+      with_color_document: [
+        {
+          "type" => "heading_1",
+          "heading_1" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Main Title" } }
+            ]
+          }
+        },
+        {
+          "type" => "table_of_contents",
+          "table_of_contents" => {
+            "color" => "orange_background"
+          }
+        },
+        {
+          "type" => "heading_2",
+          "heading_2" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Subsection" } }
+            ]
+          }
+        },
+        {
+          "type" => "heading_3",
+          "heading_3" => {
+            "rich_text" => [
+              { "type" => "text", "text" => { "content" => "Details" } }
+            ]
+          }
+        }
+      ]
+    },
+
     bulleted_list_item: {
       simple: {
         "type" => "bulleted_list_item",
