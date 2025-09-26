@@ -101,10 +101,17 @@ module NotionRubyRenderer
     def render_heading(block, level)
       heading_data = block["heading_#{level}"]
       content = @rich_text_renderer.render(heading_data["rich_text"])
+
+      # Extract plain text for ID generation
+      plain_text = heading_data["rich_text"].map { |rt| rt["plain_text"] || rt.dig("text", "content") || "" }.join
+      heading_id = generate_heading_id(plain_text)
+
       css_class = @renderer.css_classes["h#{level}".to_sym]
       class_attr = css_class ? " class=\"#{css_class}\"" : ""
-      heading_html = "<h#{level}#{class_attr}>#{content}</h#{level}>"
-      
+      id_attr = " id=\"#{heading_id}\""
+
+      heading_html = "<h#{level}#{id_attr}#{class_attr}>#{content}</h#{level}>"
+
       if heading_data["is_toggleable"]
         "<details><summary>#{heading_html}</summary></details>"
       else
