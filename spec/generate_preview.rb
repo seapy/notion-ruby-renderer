@@ -11,18 +11,57 @@ def generate_preview_html
   html_sections = []
   
   NotionTestFixtures::BLOCKS.each do |block_type, variants|
-    next if block_type == :combined_list
-    
     variants.each do |variant_name, block_data|
       section_title = "#{block_type.to_s.tr('_', ' ').capitalize} - #{variant_name}"
-      rendered_html = renderer.render_block(block_data)
-      
+
+      # Check if block_data is an array (for combined_list, table_of_contents with document)
+      if block_data.is_a?(Array)
+        rendered_html = renderer.render(block_data, nil, wrapper: false)
+
+        # Create a readable structure description for array-based fixtures
+        structure_desc = block_data.map do |block|
+          case block["type"]
+          when "heading_1"
+            "- Heading 1: \"#{block["heading_1"]["rich_text"][0]["text"]["content"]}\""
+          when "heading_2"
+            "  - Heading 2: \"#{block["heading_2"]["rich_text"][0]["text"]["content"]}\""
+          when "heading_3"
+            "    - Heading 3: \"#{block["heading_3"]["rich_text"][0]["text"]["content"]}\""
+          when "table_of_contents"
+            color = block["table_of_contents"]["color"]
+            color_text = color && color != "default" ? " with #{color} color" : ""
+            "- [Table of Contents Block#{color_text}]"
+          when "paragraph"
+            text = block["paragraph"]["rich_text"][0]["text"]["content"]
+            truncated = text.length > 30 ? "#{text[0..30]}..." : text
+            "- Paragraph: \"#{truncated}\""
+          when "bulleted_list_item"
+            "- Bullet: \"#{block["bulleted_list_item"]["rich_text"][0]["text"]["content"]}\""
+          when "numbered_list_item"
+            "- Number: \"#{block["numbered_list_item"]["rich_text"][0]["text"]["content"]}\""
+          else
+            "- #{block["type"].tr('_', ' ').capitalize}"
+          end
+        end.compact.join("\n")
+
+        input_content = <<~HTML
+          <h4>Input (Document structure):</h4>
+          <pre><code>#{structure_desc}</code></pre>
+        HTML
+      else
+        rendered_html = renderer.render_block(block_data)
+
+        input_content = <<~HTML
+          <h4>Input (Notion Block):</h4>
+          <pre><code>#{block_data.to_s.gsub('<', '&lt;').gsub('>', '&gt;')}</code></pre>
+        HTML
+      end
+
       html_sections << <<~HTML
         <div class="test-section">
           <h3 class="test-title">#{section_title}</h3>
           <div class="test-input">
-            <h4>Input (Notion Block):</h4>
-            <pre><code>#{block_data.to_s.gsub('<', '&lt;').gsub('>', '&gt;')}</code></pre>
+            #{input_content.strip}
           </div>
           <div class="test-output">
             <h4>Output (Rendered HTML):</h4>
@@ -38,29 +77,6 @@ def generate_preview_html
       HTML
     end
   end
-  
-  # Add combined list test
-  combined_blocks = NotionTestFixtures.get_block(:combined_list, :blocks)
-  combined_html = renderer.render(combined_blocks, nil, wrapper: false)
-  html_sections << <<~HTML
-    <div class="test-section">
-      <h3 class="test-title">Combined Lists (List Wrapping Test)</h3>
-      <div class="test-input">
-        <h4>Input (Multiple List Items):</h4>
-        <pre><code>#{combined_blocks.to_s.gsub('<', '&lt;').gsub('>', '&gt;')}</code></pre>
-      </div>
-      <div class="test-output">
-        <h4>Output (Wrapped Lists):</h4>
-        <div class="rendered-content notion-ruby-renderer">
-          #{combined_html}
-        </div>
-      </div>
-      <div class="test-html-source">
-        <h4>HTML Source:</h4>
-        <pre><code>#{combined_html.gsub('<', '&lt;').gsub('>', '&gt;')}</code></pre>
-      </div>
-    </div>
-  HTML
   
   # Generate complete HTML document
   <<~HTML

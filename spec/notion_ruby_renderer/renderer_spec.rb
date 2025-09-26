@@ -33,28 +33,28 @@ RSpec.describe NotionRubyRenderer::Renderer do
   end
 
   describe "heading rendering" do
-    it "renders heading 1" do
+    it "renders heading 1 with id" do
       block = NotionTestFixtures.get_block(:heading_1, :simple)
       result = renderer.render_block(block)
-      expect(result).to eq('<h1>Heading Level 1</h1>')
+      expect(result).to eq('<h1 id="heading-level-1">Heading Level 1</h1>')
     end
 
-    it "renders toggleable heading 1" do
+    it "renders toggleable heading 1 with id" do
       block = NotionTestFixtures.get_block(:heading_1, :with_toggle)
       result = renderer.render_block(block)
-      expect(result).to eq('<details><summary><h1>Toggleable Heading 1</h1></summary></details>')
+      expect(result).to eq('<details><summary><h1 id="toggleable-heading-1">Toggleable Heading 1</h1></summary></details>')
     end
 
-    it "renders heading 2" do
+    it "renders heading 2 with id" do
       block = NotionTestFixtures.get_block(:heading_2, :simple)
       result = renderer.render_block(block)
-      expect(result).to eq('<h2>Heading Level 2</h2>')
+      expect(result).to eq('<h2 id="heading-level-2">Heading Level 2</h2>')
     end
 
-    it "renders heading 3" do
+    it "renders heading 3 with id" do
       block = NotionTestFixtures.get_block(:heading_3, :simple)
       result = renderer.render_block(block)
-      expect(result).to eq('<h3>Heading Level 3</h3>')
+      expect(result).to eq('<h3 id="heading-level-3">Heading Level 3</h3>')
     end
   end
 
@@ -241,6 +241,41 @@ RSpec.describe NotionRubyRenderer::Renderer do
         </table>
       HTML
       expect(result).to eq(expected)
+    end
+  end
+
+  describe "table_of_contents rendering" do
+    it "renders table of contents placeholder when no headings" do
+      block = NotionTestFixtures.get_block(:table_of_contents, :simple)
+      result = renderer.render([block], nil, wrapper: false)
+      expect(result).to eq('<div class="notion-table-of-contents" data-notion-toc="true"></div>')
+    end
+
+    it "renders table of contents with headings" do
+      blocks = [
+        NotionTestFixtures.get_block(:heading_1, :simple),
+        NotionTestFixtures.get_block(:heading_2, :simple),
+        NotionTestFixtures.get_block(:heading_3, :simple),
+        NotionTestFixtures.get_block(:table_of_contents, :simple)
+      ]
+      result = renderer.render(blocks, nil, wrapper: false)
+
+      expect(result).to include('<h1 id="heading-level-1">Heading Level 1</h1>')
+      expect(result).to include('<h2 id="heading-level-2">Heading Level 2</h2>')
+      expect(result).to include('<h3 id="heading-level-3">Heading Level 3</h3>')
+      expect(result).to include('<nav aria-label="Table of contents">')
+      expect(result).to include('<a href="#heading-level-1">Heading Level 1</a>')
+      expect(result).to include('<a href="#heading-level-2">Heading Level 2</a>')
+      expect(result).to include('<a href="#heading-level-3">Heading Level 3</a>')
+      expect(result).to include('notion-table-of-contents-item-level-1')
+      expect(result).to include('notion-table-of-contents-item-level-2')
+      expect(result).to include('notion-table-of-contents-item-level-3')
+    end
+
+    it "renders table of contents with color" do
+      block = NotionTestFixtures.get_block(:table_of_contents, :with_color)
+      result = renderer.render([block], nil, wrapper: false)
+      expect(result).to include('class="notion-table-of-contents notion-color-gray-background"')
     end
   end
 end
