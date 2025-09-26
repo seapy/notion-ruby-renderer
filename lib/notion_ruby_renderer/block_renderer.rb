@@ -121,11 +121,12 @@ module NotionRubyRenderer
 
     def generate_heading_id(text)
       # Convert heading text to a URL-safe ID
+      # Keep Korean characters and other Unicode letters
       text.downcase
-          .gsub(/[^\w\s-]/, '') # Remove non-word characters
-          .gsub(/\s+/, '-')     # Replace spaces with hyphens
-          .gsub(/-+/, '-')      # Replace multiple hyphens with single
-          .gsub(/^-|-$/, '')    # Remove leading/trailing hyphens
+          .gsub(/[^\p{L}\p{N}\s-]/, '') # Keep letters (including Korean), numbers, spaces, and hyphens
+          .gsub(/\s+/, '-')              # Replace spaces with hyphens
+          .gsub(/-+/, '-')               # Replace multiple hyphens with single
+          .gsub(/^-|-$/, '')             # Remove leading/trailing hyphens
     end
 
     def render_list_item(block)
