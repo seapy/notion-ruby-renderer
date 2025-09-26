@@ -296,3 +296,69 @@
 .notion-ruby-renderer .notion-color-purple-background { background-color: #F6F3F9; }
 .notion-ruby-renderer .notion-color-pink-background { background-color: #FAF1F5; }
 .notion-ruby-renderer .notion-color-red-background { background-color: #FDEBEC; }
+
+/* Table of Contents */
+.notion-ruby-renderer .notion-table-of-contents {
+  margin: 1.5em 0;
+  padding: 1em;
+  border-radius: 3px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+/* Default background color only when no color class is specified */
+.notion-ruby-renderer .notion-table-of-contents:not([class*="notion-color-"]) {
+  background-color: #f7f6f3;
+}
+
+.notion-ruby-renderer .notion-table-of-contents nav {
+  display: block;
+}
+
+.notion-ruby-renderer .notion-table-of-contents-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.notion-ruby-renderer .notion-table-of-contents-list ul {
+  list-style: none;
+  margin: 0;
+}
+
+.notion-ruby-renderer .notion-table-of-contents-item {
+  margin: 0.25em 0;
+  line-height: 1.4;
+}
+
+.notion-ruby-renderer .notion-table-of-contents-item-level-1 {
+  padding-left: 0;
+  font-weight: 500;
+}
+
+.notion-ruby-renderer .notion-table-of-contents-item-level-2 {
+  padding-left: 1.5em;
+}
+
+.notion-ruby-renderer .notion-table-of-contents-item-level-3 {
+  padding-left: 3em;
+}
+
+.notion-ruby-renderer .notion-table-of-contents a {
+  color: #37352f;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.1s ease-in;
+}
+
+.notion-ruby-renderer .notion-table-of-contents a:hover {
+  color: #037dd3;
+  border-bottom-color: #037dd3;
+}
+
+/* Ensure headings have proper scroll-margin for anchor links */
+.notion-ruby-renderer h1[id],
+.notion-ruby-renderer h2[id],
+.notion-ruby-renderer h3[id] {
+  scroll-margin-top: 2em;
+}
